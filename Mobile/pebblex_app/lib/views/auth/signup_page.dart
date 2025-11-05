@@ -1,27 +1,25 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:pebblex_app/views/auth/signup_page.dart';
+import 'package:pebblex_app/views/auth/login_page.dart';
 import 'package:pebblex_app/views/home/main_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  //// Controllers for managing text input fields
+class _SignupPageState extends State<SignupPage> {
+  late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-
-  //// Form key for validation
+  late final TextEditingController _confirmPasswordController;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // // State variables for UI behavior
-  bool _isPasswordHidden = true; //Toggle password visibility.
-  bool _isLoading = false; //Show loading spinner while login is processing.
-  late final TapGestureRecognizer _signUpRecognizer;
+  bool _isPasswordHidden = true;
+  bool _isConfirmPasswordHidden = true;
+  bool _isLoading = false;
+  late final TapGestureRecognizer _loginRecognizer;
 
   // Constants for better maintainability
   static const double _fieldWidth = 350;
@@ -30,153 +28,108 @@ class _LoginPageState extends State<LoginPage> {
   static const double _fieldSpacing = 15;
 
   @override
-  //Initializes controllers when the widget is created.
   void initState() {
     super.initState();
+    _usernameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _signUpRecognizer = TapGestureRecognizer()..onTap = _navigateToSignUp;
+    _confirmPasswordController = TextEditingController();
+    _loginRecognizer = TapGestureRecognizer()..onTap = _navigateToLogin;
   }
 
   @override
-  //Frees up memory by disposing controllers when widget is removed.
   void dispose() {
+    super.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _signUpRecognizer.dispose();
-    super.dispose();
+    _confirmPasswordController.dispose();
+    _loginRecognizer.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    // Validate all form fields
-    //_formKey.currentState - Accesses the current state of the Form widget
-    //.validate() - Runs all validator functions in the form (calls _validateEmail and _validatePassword)
+  Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Unfocus keyboard
     FocusScope.of(context).unfocus();
-    //Show loading state
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement actual authentication logic here
-      /*
-      final response = await _firebaseService.login(
-        emailAddress: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-
-      // Check if widget is still mounted and authentication succeeded
+      //signup logic here
+      await Future.delayed(const Duration(seconds: 2));
       if (!mounted) return;
-
-      if (response != null && response.user != null) {
-        // Step 5: Retrieve and save user session
-        await _sessionController.getUser();
-        final savedName = SessionController.user?.name;
-        
-        // Create user model with authenticated data
-        final userModel = UserModel(
-          id: response.user?.uid,
-          name: savedName,
-          email: response.user?.email,
-        );
-        
-        // Save user to session/local storage
-        await _sessionController.saveUser(userModel);
-
-        // Check mounted again before navigation
-        if (!mounted) return;
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login Successful'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Step 6: Navigate to main page
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
-      } else {
-        // Handle case where response is null or user is null
-        throw Exception('Authentication failed - Invalid credentials');
-      }
-      */
-
-      await Future.delayed(const Duration(seconds: 2)); // Simulated API call
-
-      if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Login Successful"),
+        const SnackBar(
+          content: Text('User registered successfully!'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 5),
         ),
       );
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => MainPage()));
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Login failed: ${e.toString()}'),
+          content: Text('Signup failed: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      //// Always reset loading state
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
   }
 
-  //// Navigate to forgot password page
-  void _navigateToForgotPassword() {
-    // TODO: Implement navigation to forgot password page
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Forgot Password - Coming Soon')),
-    );
-  }
-
-  void _navigateToSignUp() {
+  void _navigateToLogin() {
     Navigator.of(
       context,
-    ).pushReplacement(MaterialPageRoute(builder: (context) => SignupPage()));
+    ).pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //// SafeArea prevents overlap with system UI
       body: SafeArea(
-        //prevents overflow
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: 24),
           child: Form(
-            //Wraps input fields for validation.
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: _topSpacing),
-                // TODO: Add your app logo here
+                //  Add your app logo here
                 // Image.asset('assets/images/logo.png', height: 100),
                 const SizedBox(height: _logoSpacing),
 
                 Text(
-                  'LOGIN',
+                  'SIGN UP',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
+
                 const SizedBox(height: 32),
 
-                // Email Input Field
+                //Username Input Field
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: _fieldWidth),
+                  child: TextFormField(
+                    controller: _usernameController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !_isLoading,
+                    validator: _validateName,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Username',
+                      hintText: 'Enter Your Username',
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                  ),
+                ),
+                SizedBox(height: _fieldSpacing),
+
+                //Email Input Field
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: _fieldWidth),
                   child: TextFormField(
@@ -193,19 +146,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: _fieldSpacing),
+                SizedBox(height: _fieldSpacing),
 
-                // Password Input Field
+                //Password Input Field
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: _fieldWidth),
                   child: TextFormField(
                     controller: _passwordController,
                     obscureText: _isPasswordHidden,
-                    textInputAction: TextInputAction.done,
-                    // is a property of TextFormField that controls whether the user can interact with the input field
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                     enabled: !_isLoading,
-                    //onFieldSubmitted is a callback function that gets triggered when the user presses the action button on the keyboard (in this case, the "Done" button).
-                    onFieldSubmitted: (_) => _handleLogin(),
                     validator: _validatePassword,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -227,28 +178,43 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
-                // Forgot Password
+                SizedBox(height: _fieldSpacing),
+
+                //Confirm Password Input Field
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _isLoading ? null : _navigateToForgotPassword,
-                      child: const Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                  constraints: BoxConstraints(maxWidth: _fieldWidth),
+                  child: TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: _isConfirmPasswordHidden,
+                    textInputAction: TextInputAction.done,
+                    enabled: !_isLoading,
+                    onFieldSubmitted: (_) => _handleSignup(),
+                    validator: _validateConfirmPassword,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Confirm Password',
+                      hintText: 'Enter Your Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordHidden =
+                                !_isConfirmPasswordHidden;
+                          });
+                        },
+                        icon: Icon(
+                          _isConfirmPasswordHidden
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
-                // Login Button
+                //SignUp Button
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: _fieldWidth),
                   child: SizedBox(
@@ -262,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         disabledBackgroundColor: Colors.grey.shade400,
                       ),
-                      onPressed: _isLoading ? null : _handleLogin,
+                      onPressed: _isLoading ? null : _handleSignup,
                       child: _isLoading
                           ? const SizedBox(
                               height: 24,
@@ -273,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )
                           : const Text(
-                              'LOGIN',
+                              'SIGN UP',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -282,18 +248,18 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
-                //Navigation to Signup
+                //Navigation to Login
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: _fieldWidth),
                   child: RichText(
                     text: TextSpan(
-                      text: "Don't have an account?",
+                      text: "Already have an account?",
                       style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                       children: [
                         TextSpan(
-                          text: 'Sign Up',
+                          text: 'Login',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -302,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                                 : Colors.red.shade400,
                             decoration: TextDecoration.underline,
                           ),
-                          recognizer: _isLoading ? null : _signUpRecognizer,
+                          recognizer: _isLoading ? null : _loginRecognizer,
                         ),
                       ],
                     ),
@@ -327,6 +293,14 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
+  //validate Name format
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please Enter a Username';
+    }
+    return null;
+  }
+
   //validate password requirements
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -334,6 +308,18 @@ class _LoginPageState extends State<LoginPage> {
     }
     if (value.length < 8) {
       return 'Password must be at least 8 characters';
+    }
+    return null;
+  }
+
+  //validate confirm password
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please confirm your password';
+    }
+    // ✅ CORRECT: Use .text directly (already a String)
+    if (value != _passwordController.text) {
+      return 'Passwords do not match';
     }
     return null;
   }
