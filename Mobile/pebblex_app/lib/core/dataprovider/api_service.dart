@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pebblex_app/core/services/secure_storage.dart';
@@ -30,7 +29,7 @@ class ApiService {
   //HTTP POST Request
   Future<dynamic> httpPost({
     required String url,
-    required Map<String, dynamic> body,
+    required String body,
     required bool isWithoutToken,
   }) async {
     try {
@@ -94,10 +93,10 @@ class ApiService {
     required bool isWithoutToken,
   }) async {
     final headers = {"Content-Type": "application/json"};
-    // if(!isWithoutToken){
+    // if (!isWithoutToken) {
     //   final token = await _storage.readValue(key);
-    //   if(token !=null && token.isNotEmpty){
-    //     headers['Authorization'] ='Bearer $token';
+    //   if (token != null && token.isNotEmpty) {
+    //     headers['Authorization'] = 'Bearer $token';
     //   }
     // }
     return headers;

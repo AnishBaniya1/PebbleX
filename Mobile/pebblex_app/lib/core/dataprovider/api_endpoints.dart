@@ -4,5 +4,6 @@ class ApiEndpoints {
   // static const String _prodUrl = '';
   static const String baseUrl = _devUrl;
 
-  static const String postLoginApi = '$baseUrl/token';
+  static const String loginApi = '$baseUrl/token';
+  static const String registerApi = '$baseUrl/register';
 }
