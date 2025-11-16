@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pebblex_app/providers/auth_provider.dart';
 import 'package:pebblex_app/views/auth/login_page.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +13,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginPage());
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
+    );
   }
 }
