@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:pebblex_app/providers/auth_provider.dart';
 import 'package:pebblex_app/views/auth/signup_page.dart';
 import 'package:pebblex_app/views/home/main_page.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,7 +24,6 @@ class _LoginPageState extends State<LoginPage> {
 
   // // State variables for UI behavior
   bool _isPasswordHidden = true; //Toggle password visibility.
-  bool _isLoading = false; //Show loading spinner while login is processing.
   late final TapGestureRecognizer _signUpRecognizer;
 
   // Constants for better maintainability
@@ -55,68 +58,27 @@ class _LoginPageState extends State<LoginPage> {
 
     // Unfocus keyboard
     FocusScope.of(context).unfocus();
-    //Show loading state
-    setState(() => _isLoading = true);
+
+    final authProvider = context.read<AuthProvider>();
 
     try {
-      // TODO: Implement actual authentication logic here
-      /*
-      final response = await _firebaseService.login(
-        emailAddress: _emailController.text.trim(),
+      await authProvider.login(
+        email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
       // Check if widget is still mounted and authentication succeeded
       if (!mounted) return;
 
-      if (response != null && response.user != null) {
-        // Step 5: Retrieve and save user session
-        await _sessionController.getUser();
-        final savedName = SessionController.user?.name;
-        
-        // Create user model with authenticated data
-        final userModel = UserModel(
-          id: response.user?.uid,
-          name: savedName,
-          email: response.user?.email,
-        );
-        
-        // Save user to session/local storage
-        await _sessionController.saveUser(userModel);
-
-        // Check mounted again before navigation
-        if (!mounted) return;
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login Successful'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Step 6: Navigate to main page
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
-      } else {
-        // Handle case where response is null or user is null
-        throw Exception('Authentication failed - Invalid credentials');
-      }
-      */
-
-      await Future.delayed(const Duration(seconds: 2)); // Simulated API call
-
-      if (!mounted) return;
-
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Login Successful"),
+        const SnackBar(
+          content: Text('Login Successful'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 5),
         ),
       );
 
+      // Step 6: Navigate to main page
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainPage()),
       );
@@ -125,21 +87,18 @@ class _LoginPageState extends State<LoginPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Login failed: ${e.toString()}'),
+          content: Text(
+            'Login failed: ${authProvider.errorMessage ?? e.toString()}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
-    } finally {
-      //// Always reset loading state
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      log(authProvider.errorMessage ?? "");
     }
   }
 
   //// Navigate to forgot password page
   void _navigateToForgotPassword() {
-    // TODO: Implement navigation to forgot password page
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Forgot Password - Coming Soon')),
     );
@@ -179,18 +138,22 @@ class _LoginPageState extends State<LoginPage> {
                 // Email Input Field
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    enabled: !_isLoading,
-                    validator: _validateEmail,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                      hintText: 'Enter Your Email',
-                      prefixIcon: Icon(Icons.email_rounded),
-                    ),
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        enabled: !authProvider.isLoading,
+                        validator: _validateEmail,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                          hintText: 'Enter Your Email',
+                          prefixIcon: Icon(Icons.email_rounded),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: _fieldSpacing),
@@ -198,33 +161,37 @@ class _LoginPageState extends State<LoginPage> {
                 // Password Input Field
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: _fieldWidth),
-                  child: TextFormField(
-                    controller: _passwordController,
-                    obscureText: _isPasswordHidden,
-                    textInputAction: TextInputAction.done,
-                    // is a property of TextFormField that controls whether the user can interact with the input field
-                    enabled: !_isLoading,
-                    //onFieldSubmitted is a callback function that gets triggered when the user presses the action button on the keyboard (in this case, the "Done" button).
-                    onFieldSubmitted: (_) => _handleLogin(),
-                    validator: _validatePassword,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                      hintText: 'Enter Your Password',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordHidden = !_isPasswordHidden;
-                          });
-                        },
-                        icon: Icon(
-                          _isPasswordHidden
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return TextFormField(
+                        controller: _passwordController,
+                        obscureText: _isPasswordHidden,
+                        textInputAction: TextInputAction.done,
+                        // is a property of TextFormField that controls whether the user can interact with the input field
+                        enabled: !authProvider.isLoading,
+                        //onFieldSubmitted is a callback function that gets triggered when the user presses the action button on the keyboard (in this case, the "Done" button).
+                        onFieldSubmitted: (_) => _handleLogin(),
+                        validator: _validatePassword,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Password',
+                          hintText: 'Enter Your Password',
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordHidden = !_isPasswordHidden;
+                              });
+                            },
+                            icon: Icon(
+                              _isPasswordHidden
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -234,15 +201,21 @@ class _LoginPageState extends State<LoginPage> {
                   constraints: const BoxConstraints(maxWidth: _fieldWidth),
                   child: Align(
                     alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _isLoading ? null : _navigateToForgotPassword,
-                      child: const Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                    child: Consumer<AuthProvider>(
+                      builder: (context, authProvider, child) {
+                        return TextButton(
+                          onPressed: authProvider.isLoading
+                              ? null
+                              : _navigateToForgotPassword,
+                          child: const Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -251,35 +224,41 @@ class _LoginPageState extends State<LoginPage> {
                 // Login Button
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade400,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        disabledBackgroundColor: Colors.grey.shade400,
-                      ),
-                      onPressed: _isLoading ? null : _handleLogin,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text(
-                              'LOGIN',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade400,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                    ),
+                            disabledBackgroundColor: Colors.grey.shade400,
+                          ),
+                          onPressed: authProvider.isLoading
+                              ? null
+                              : _handleLogin,
+                          child: authProvider.isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'LOGIN',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -287,25 +266,34 @@ class _LoginPageState extends State<LoginPage> {
                 //Navigation to Signup
                 ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: _fieldWidth),
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Don't have an account?",
-                      style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-                      children: [
-                        TextSpan(
-                          text: 'Sign Up',
+                  child: Consumer<AuthProvider>(
+                    builder: (context, authProvider, child) {
+                      return RichText(
+                        text: TextSpan(
+                          text: "Don't have an account?",
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: _isLoading
-                                ? Colors.grey
-                                : Colors.red.shade400,
-                            decoration: TextDecoration.underline,
+                            color: Colors.grey[700],
                           ),
-                          recognizer: _isLoading ? null : _signUpRecognizer,
+                          children: [
+                            TextSpan(
+                              text: 'Sign Up',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: authProvider.isLoading
+                                    ? Colors.grey
+                                    : Colors.red.shade400,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: authProvider.isLoading
+                                  ? null
+                                  : _signUpRecognizer,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
