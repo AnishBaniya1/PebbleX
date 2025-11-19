@@ -38,7 +38,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
-        body: jsonEncode(body),
+        body: body,
       );
 
       return _handleResponse(response);

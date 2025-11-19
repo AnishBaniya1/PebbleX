@@ -5,9 +5,7 @@ class AuthRepository {
   final ApiService _apiService = ApiService.instance;
 
   //login api call
-  Future<void> login({
-    required String body,
-  }) async {
+  Future<Map<String, dynamic>> login({required String body}) async {
     final response = await _apiService.httpPost(
       url: ApiEndpoints.loginApi,
       body: body,
@@ -17,9 +15,7 @@ class AuthRepository {
   }
 
   // Register API call
-  Future<Map<String, dynamic>> register({
-    required String body,
-  }) async {
+  Future<Map<String, dynamic>> register({required String body}) async {
     final response = await _apiService.httpPost(
       url: ApiEndpoints.registerApi,
       body: body,
