@@ -1,38 +1,37 @@
-import 'dart:convert';
-
-LoginResponseModel loginResponseModelFromJson(String str) =>
-    LoginResponseModel.fromJson(json.decode(str));
-
-String loginResponseModelToJson(LoginResponseModel data) => json.encode(data.toJson());
-
 class LoginResponseModel {
-    LoginResponseModel({
-        required this.isSuccess,
-        required this.data,
-        required this.error,
-        required this.message,
-    });
+  LoginResponseModel({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.role,
+    required this.token,
+    required this.message,
+  });
 
-    final bool? isSuccess;
-    final String? data;
-    final dynamic error;
-    final String? message;
+  final String? id;
+  final String? name;
+  final String? email;
+  final String? role;
+  final String? token;
+  final String? message;
 
-    factory LoginResponseModel.fromJson(Map<String, dynamic> json){ 
-        return LoginResponseModel(
-            isSuccess: json["isSuccess"],
-            data: json["data"],
-            error: json["error"],
-            message: json["message"],
-        );
-    }
+  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    return LoginResponseModel(
+      id: json["_id"],
+      name: json["name"],
+      email: json["email"],
+      role: json["role"],
+      token: json["token"],
+      message: json["message"],
+    );
+  }
 
-    Map<String, dynamic> toJson() => {
-        "isSuccess": isSuccess,
-        "data": data,
-        "error": error,
-        "message": message,
-    };
-
+  Map<String, dynamic> toJson() => {
+    "_id": id,
+    "name": name,
+    "email": email,
+    "role": role,
+    "token": token,
+    "message": message,
+  };
 }
-

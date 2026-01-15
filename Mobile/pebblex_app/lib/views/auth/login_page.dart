@@ -1,10 +1,10 @@
 import 'dart:developer';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pebblex_app/providers/auth_provider.dart';
 import 'package:pebblex_app/views/auth/signup_page.dart';
 import 'package:pebblex_app/views/home/main_page.dart';
+import 'package:pebblex_app/views/auth/widgets/customtextfield.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,25 +15,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  //// Controllers for managing text input fields
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-
-  //// Form key for validation
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // // State variables for UI behavior
-  bool _isPasswordHidden = true; //Toggle password visibility.
+  bool _isPasswordHidden = true;
   late final TapGestureRecognizer _signUpRecognizer;
 
-  // Constants for better maintainability
-  static const double _fieldWidth = 350;
-  static const double _topSpacing = 70;
-  static const double _logoSpacing = 40;
-  static const double _fieldSpacing = 15;
-
   @override
-  //Initializes controllers when the widget is created.
   void initState() {
     super.initState();
     _emailController = TextEditingController();
@@ -42,7 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  //Frees up memory by disposing controllers when widget is removed.
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -51,14 +38,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
-    // Validate all form fields
-    //_formKey.currentState - Accesses the current state of the Form widget
-    //.validate() - Runs all validator functions in the form (calls _validateEmail and _validatePassword)
     if (!_formKey.currentState!.validate()) return;
-
-    // Unfocus keyboard
     FocusScope.of(context).unfocus();
-
     final authProvider = context.read<AuthProvider>();
 
     try {
@@ -67,10 +48,8 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
 
-      // Check if widget is still mounted and authentication succeeded
       if (!mounted) return;
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Login Successful'),
@@ -78,7 +57,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      // Step 6: Navigate to main page
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainPage()),
       );
@@ -97,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //// Navigate to forgot password page
   void _navigateToForgotPassword() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Forgot Password - Coming Soon')),
@@ -105,185 +82,248 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _navigateToSignUp() {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (context) => SignupPage()));
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const SignupPage()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+    final isTablet = size.width >= 600 && size.width < 1024;
+
+    // Responsive values
+    final horizontalPadding = isSmallScreen ? 24.0 : size.width * 0.1;
+    final verticalPadding = isSmallScreen ? 8.0 : 24.0;
+    final fieldWidth = isSmallScreen ? double.infinity : 450.0;
+    final cardPadding = isSmallScreen ? 24.0 : 32.0;
+    final iconSize = isSmallScreen ? 50.0 : (isTablet ? 60.0 : 70.0);
+    final iconPadding = isSmallScreen ? 16.0 : 20.0;
+    final titleSize = isSmallScreen ? 28.0 : (isTablet ? 32.0 : 36.0);
+    final subtitleSize = isSmallScreen ? 15.0 : 17.0;
+    final linkFontSize = isSmallScreen ? 16.0 : 17.0;
+
+    // Spacing
+    final headerSpacing = size.height * 0.03;
+    final subtitleSpacing = isSmallScreen ? 6.0 : 8.0;
+    final fieldSpacing = isSmallScreen ? 18.0 : 20.0;
+    final forgotPasswordSpacing = isSmallScreen ? 10.0 : 12.0;
+    final buttonSpacing = isSmallScreen ? 20.0 : 24.0;
+    final buttonHeight = isSmallScreen ? 52.0 : 56.0;
+    final sectionSpacing = size.height * 0.04;
+
     return Scaffold(
-      //// SafeArea prevents overlap with system UI
-      body: SafeArea(
-        //prevents overflow
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Form(
-            //Wraps input fields for validation.
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: _topSpacing),
-                // TODO: Add your app logo here
-                // Image.asset('assets/images/logo.png', height: 100),
-                const SizedBox(height: _logoSpacing),
-
-                Text(
-                  'LOGIN',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                const SizedBox(height: 32),
-
-                // Email Input Field
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
-                      return TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        enabled: !authProvider.isLoading,
-                        validator: _validateEmail,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Email',
-                          hintText: 'Enter Your Email',
-                          prefixIcon: Icon(Icons.email_rounded),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade700,
+              Colors.blue.shade400,
+              Colors.lightBlue.shade300,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo/Icon Section
+                  Container(
+                    padding: EdgeInsets.all(iconPadding),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 20,
+                          offset: Offset(0, 10),
                         ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: _fieldSpacing),
-
-                // Password Input Field
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: _fieldWidth),
-                  child: Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
-                      return TextFormField(
-                        controller: _passwordController,
-                        obscureText: _isPasswordHidden,
-                        textInputAction: TextInputAction.done,
-                        // is a property of TextFormField that controls whether the user can interact with the input field
-                        enabled: !authProvider.isLoading,
-                        //onFieldSubmitted is a callback function that gets triggered when the user presses the action button on the keyboard (in this case, the "Done" button).
-                        onFieldSubmitted: (_) => _handleLogin(),
-                        validator: _validatePassword,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Password',
-                          hintText: 'Enter Your Password',
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordHidden = !_isPasswordHidden;
-                              });
-                            },
-                            icon: Icon(
-                              _isPasswordHidden
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Forgot Password
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Consumer<AuthProvider>(
-                      builder: (context, authProvider, child) {
-                        return TextButton(
-                          onPressed: authProvider.isLoading
-                              ? null
-                              : _navigateToForgotPassword,
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        );
-                      },
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.lock_outline_rounded,
+                      size: iconSize,
+                      color: Colors.blue.shade700,
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  SizedBox(height: headerSpacing),
 
-                // Login Button
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _fieldWidth),
-                  child: Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
-                      return SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade400,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            disabledBackgroundColor: Colors.grey.shade400,
+                  // Welcome Text
+                  Text(
+                    'Welcome Back',
+                    style: TextStyle(
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: subtitleSpacing),
+                  Text(
+                    'Sign in to continue',
+                    style: TextStyle(
+                      fontSize: subtitleSize,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // Login Form Card
+                  Container(
+                    constraints: BoxConstraints(maxWidth: fieldWidth),
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 30,
+                          offset: Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Email Field
+                          CustomTextField(
+                            controller: _emailController,
+                            label: 'Email',
+                            hint: 'Enter your email',
+                            icon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: _validateEmail,
+                            textInputAction: TextInputAction.next,
                           ),
-                          onPressed: authProvider.isLoading
-                              ? null
-                              : _handleLogin,
-                          child: authProvider.isLoading
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  'LOGIN',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
+                          SizedBox(height: fieldSpacing),
+
+                          // Password Field
+                          CustomTextField(
+                            controller: _passwordController,
+                            label: 'Password',
+                            hint: 'Enter your password',
+                            icon: Icons.lock_outline,
+                            obscureText: _isPasswordHidden,
+                            validator: _validatePassword,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: _handleLogin,
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordHidden = !_isPasswordHidden;
+                                });
+                              },
+                              icon: Icon(
+                                _isPasswordHidden
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: forgotPasswordSpacing),
+
+                          // Forgot Password
+                          Consumer<AuthProvider>(
+                            builder: (context, authProvider, child) {
+                              return Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: authProvider.isLoading
+                                      ? null
+                                      : _navigateToForgotPassword,
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(
+                                      fontSize: subtitleSize - 1,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.blue.shade700,
+                                    ),
                                   ),
                                 ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
+                              );
+                            },
+                          ),
+                          SizedBox(height: buttonSpacing),
 
-                //Navigation to Signup
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: _fieldWidth),
-                  child: Consumer<AuthProvider>(
+                          // Login Button
+                          Consumer<AuthProvider>(
+                            builder: (context, authProvider, child) {
+                              return SizedBox(
+                                height: buttonHeight,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade700,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    elevation: 4,
+                                    shadowColor: Colors.blue.shade700
+                                        .withValues(alpha: 0.5),
+                                    disabledBackgroundColor:
+                                        Colors.grey.shade400,
+                                  ),
+                                  onPressed: authProvider.isLoading
+                                      ? null
+                                      : _handleLogin,
+                                  child: authProvider.isLoading
+                                      ? SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.5,
+                                          ),
+                                        )
+                                      : Text(
+                                          'LOGIN',
+                                          style: TextStyle(
+                                            fontSize: isSmallScreen ? 16 : 18,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.2,
+                                          ),
+                                        ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: headerSpacing),
+
+                  // Sign Up Link
+                  Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {
                       return RichText(
                         text: TextSpan(
-                          text: "Don't have an account?",
+                          text: "Don't have an account? ",
                           style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[700],
+                            fontSize: linkFontSize,
+                            color: Colors.white,
                           ),
                           children: [
                             TextSpan(
                               text: 'Sign Up',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: linkFontSize,
                                 fontWeight: FontWeight.bold,
-                                color: authProvider.isLoading
-                                    ? Colors.grey
-                                    : Colors.red.shade400,
+                                color: Colors.white,
                                 decoration: TextDecoration.underline,
                               ),
                               recognizer: authProvider.isLoading
@@ -295,8 +335,8 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -304,7 +344,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  //validate email fromat
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter an email address';
@@ -315,7 +354,6 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  //validate password requirements
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
