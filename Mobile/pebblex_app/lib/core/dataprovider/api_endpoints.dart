@@ -4,7 +4,11 @@ class ApiEndpoints {
   // static const String _prodUrl = '';
   static const String baseUrl = _devUrl;
 
+  //User related api
   static const String loginApi = '$baseUrl/api/v1/login';
   static const String registerApi = '$baseUrl/api/v1/register';
   static const String getUserApi = '$baseUrl/api/v1/profile';
+
+  //Product related api
+  static const String productApi = '$baseUrl/api/v1/products';
 }

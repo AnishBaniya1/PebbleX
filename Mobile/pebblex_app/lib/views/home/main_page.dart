@@ -32,7 +32,7 @@ class _MainPageState extends State<MainPage> {
         height: 65,
         index: _currentIndex,
         backgroundColor: Colors.white,
-        color: Colors.black,
+        color: Colors.blue.shade700,
         animationCurve: Curves.easeInOut,
         animationDuration: Duration(milliseconds: 500),
         onTap: (int index) {
@@ -49,4 +49,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-

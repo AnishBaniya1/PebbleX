@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pebblex_app/core/services/auth_service.dart';
 import 'package:pebblex_app/core/services/secure_storage.dart';
 import 'package:pebblex_app/models/loginresponse_model.dart';
+import 'package:pebblex_app/models/profile_model.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -59,6 +60,29 @@ class AuthProvider extends ChangeNotifier {
 
       await _authService.register(body: body);
 
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> me() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final response = await _authService.me();
+
+      ProfileModel userModel = ProfileModel.fromJson(response);
+      final user = userModel.user;
+      await _storageService.setValue('name', user?.name ?? '');
+      await _storageService.setValue('email', user?.email ?? '');
+      await _storageService.setValue('phone', user?.phone?.toString() ?? '');
+      await _storageService.setValue('address', user?.address ?? '');
       _isLoading = false;
       notifyListeners();
     } catch (e) {

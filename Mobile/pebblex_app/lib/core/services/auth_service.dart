@@ -36,15 +36,15 @@ class AuthService {
   //     return response;
   //   }
 
-  //   // Get Current User
-  //   Future<Map<String, dynamic>> me() async {
-  //     final response = await _apiService.httpGet(
-  //       url: ApiEndpoints.getUserApi,
-  //       isWithoutToken: false,
-  //     );
+  // Get Current User
+  Future<Map<String, dynamic>> me() async {
+    final response = await _apiService.httpGet(
+      url: ApiEndpoints.getUserApi,
+      isWithoutToken: false,
+    );
 
-  //     return response;
-  //   }
+    return response;
+  }
 
   //   // Update Password Api
   //   Future<Map<String, dynamic>> changepassword({required String body}) async {
