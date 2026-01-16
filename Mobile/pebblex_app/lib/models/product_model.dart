@@ -41,13 +41,15 @@ class ProductModel {
           : Supplier.fromJson(json["supplier"]),
       name: json["name"],
       description: json["description"],
-      price: json["price"],
+      price: (json["price"] as num?)
+          ?.toDouble(), // ✅ Fix: Convert num to double
       stock: json["stock"],
       sold: json["sold"],
       category: json["category"],
       sku: json["sku"],
       image: json["image"],
-      rating: json["rating"],
+      rating: (json["rating"] as num?)
+          ?.toDouble(), // ✅ Fix: Convert num to double
       status: json["status"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
