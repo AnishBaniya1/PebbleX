@@ -5,10 +5,11 @@ class ApiEndpoints {
   static const String baseUrl = _devUrl;
 
   //User related api
-  static const String loginApi = '$baseUrl/api/v1/login';
-  static const String registerApi = '$baseUrl/api/v1/register';
-  static const String getUserApi = '$baseUrl/api/v1/profile';
+  static const String loginApi = '$baseUrl/api/v1/auth/login';
+  static const String registerApi = '$baseUrl/api/v1/auth/register';
+  static const String getUserApi = '$baseUrl/api/v1/auth/profile';
 
   //Product related api
-  static const String productApi = '$baseUrl/api/v1/products';
+  static const String productApi = '$baseUrl/api/v1/product';
+  static const String orderApi = '$baseUrl/api/v1/order';
 }

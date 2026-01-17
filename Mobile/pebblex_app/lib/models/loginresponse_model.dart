@@ -1,11 +1,36 @@
 class LoginResponseModel {
   LoginResponseModel({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  final bool? success;
+  final String? message;
+  final Data? data;
+
+  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    return LoginResponseModel(
+      success: json["success"],
+      message: json["message"],
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class Data {
+  Data({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
     required this.token,
-    required this.message,
   });
 
   final String? id;
@@ -13,16 +38,14 @@ class LoginResponseModel {
   final String? email;
   final String? role;
   final String? token;
-  final String? message;
 
-  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
-    return LoginResponseModel(
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
       id: json["_id"],
       name: json["name"],
       email: json["email"],
       role: json["role"],
       token: json["token"],
-      message: json["message"],
     );
   }
 
@@ -32,6 +55,5 @@ class LoginResponseModel {
     "email": email,
     "role": role,
     "token": token,
-    "message": message,
   };
 }

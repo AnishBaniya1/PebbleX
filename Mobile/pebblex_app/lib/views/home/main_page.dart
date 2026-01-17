@@ -1,7 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:pebblex_app/views/histroy/order_historypage.dart';
 import 'package:pebblex_app/views/home/home_page.dart';
 import 'package:pebblex_app/views/setting/profilepage.dart';
+import 'package:pebblex_app/views/shopping_cart/shoppingcart_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,7 +22,15 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     //Initialize pages once
-    _pages = [const HomePage(), const Profilepage()];
+    _pages = [
+      const HomePage(),
+
+      const ShoppingcartPage(),
+
+      const OrderHistorypage(),
+
+      const Profilepage(),
+    ];
   }
 
   @override
@@ -42,7 +52,8 @@ class _MainPageState extends State<MainPage> {
         },
         items: [
           Icon(Icons.home_outlined, color: Colors.white),
-          // Icon(Icons.shopping_bag_outlined, color: Colors.white),
+          Icon(Icons.shopping_cart_outlined, color: Colors.white),
+          Icon(Icons.history, color: Colors.white),
           Icon(Icons.person_outline, color: Colors.white),
         ],
       ),

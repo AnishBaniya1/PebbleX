@@ -5,9 +5,20 @@ class ProductService {
   final ApiService _apiService = ApiService.instance;
 
   // Get Available products to vendor
-  Future<List<dynamic>> availableproduct() async {
+  Future<Map<String, dynamic>> availableproduct() async {
     final response = await _apiService.httpGet(
       url: ApiEndpoints.productApi,
+      isWithoutToken: false,
+    );
+
+    return response;
+  }
+
+  //Order a Product
+  Future<Map<String, dynamic>> orderproduct({required String body}) async {
+    final response = await _apiService.httpPost(
+      body: body,
+      url: ApiEndpoints.orderApi,
       isWithoutToken: false,
     );
 

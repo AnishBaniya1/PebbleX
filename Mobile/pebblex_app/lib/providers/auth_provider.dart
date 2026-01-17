@@ -25,7 +25,7 @@ class AuthProvider extends ChangeNotifier {
       final response = await _authService.login(body: body);
 
       LoginResponseModel loginModel = LoginResponseModel.fromJson(response);
-      await _storageService.setValue('authtoken', loginModel.token!);
+      await _storageService.setValue('authtoken', loginModel.data?.token ?? '');
       // await _storageService.setValue('role', loginModel.role!);
       await _storageService.setValue('islogin', 'true');
       _isLoading = false;
@@ -78,7 +78,7 @@ class AuthProvider extends ChangeNotifier {
       final response = await _authService.me();
 
       ProfileModel userModel = ProfileModel.fromJson(response);
-      final user = userModel.user;
+      final user = userModel.data;
       await _storageService.setValue('name', user?.name ?? '');
       await _storageService.setValue('email', user?.email ?? '');
       await _storageService.setValue('phone', user?.phone?.toString() ?? '');

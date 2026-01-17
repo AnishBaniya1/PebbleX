@@ -1,53 +1,57 @@
 class ProfileModel {
-  ProfileModel({required this.message, required this.user});
+  ProfileModel({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
 
+  final bool? success;
   final String? message;
-  final User? user;
+  final Data? data;
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
+      success: json["success"],
       message: json["message"],
-      user: json["user"] == null ? null : User.fromJson(json["user"]),
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
 
-  Map<String, dynamic> toJson() => {"message": message, "user": user?.toJson()};
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data?.toJson(),
+  };
 }
 
-class User {
-  User({
+class Data {
+  Data({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
-    required this.phone,
     required this.address,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+    required this.phone,
+    required this.isActive,
   });
 
   final String? id;
   final String? name;
   final String? email;
   final String? role;
-  final int? phone;
   final String? address;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final int? v;
+  final int? phone;
+  final bool? isActive;
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
       id: json["_id"],
       name: json["name"],
       email: json["email"],
       role: json["role"],
-      phone: json["phone"],
       address: json["address"],
-      createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
-      v: json["__v"],
+      phone: json["phone"],
+      isActive: json["isActive"],
     );
   }
 
@@ -56,10 +60,8 @@ class User {
     "name": name,
     "email": email,
     "role": role,
-    "phone": phone,
     "address": address,
-    "createdAt": createdAt?.toIso8601String(),
-    "updatedAt": updatedAt?.toIso8601String(),
-    "__v": v,
+    "phone": phone,
+    "isActive": isActive,
   };
 }

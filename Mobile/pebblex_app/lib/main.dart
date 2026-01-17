@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pebblex_app/providers/auth_provider.dart';
+import 'package:pebblex_app/providers/cart_provider.dart';
 import 'package:pebblex_app/providers/product_provider.dart';
 import 'package:pebblex_app/views/auth/login_page.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class App extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
     );

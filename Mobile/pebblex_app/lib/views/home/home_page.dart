@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pebblex_app/core/resources/resource.dart';
 import 'package:pebblex_app/providers/product_provider.dart';
+import 'package:pebblex_app/views/order/order_page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -53,12 +54,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+    final isLargeScreen = size.width > 900;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade700,
         title: Center(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.7,
+            width: size.width * (isTablet ? 0.5 : 0.7),
             child: Container(
               height: 45,
               decoration: BoxDecoration(
@@ -120,11 +125,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 16),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: size.width * 0.08,
+                      ),
                       child: Text(
                         'Error: ${productProvider.errorMessage}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: isTablet ? 18 : 16),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -140,22 +147,26 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             }
+
             final products = productProvider.products;
 
             if (products.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.shopping_bag_outlined,
-                      size: 64,
+                      size: isTablet ? 80 : 64,
                       color: Colors.grey,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
                       'No products available',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: isTablet ? 18 : 16,
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -168,16 +179,28 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 15, left: 10, right: 10),
+                  padding: EdgeInsets.only(
+                    top: 15,
+                    left: size.width * 0.03,
+                    right: size.width * 0.03,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(AppImage.homeImg),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          AppImage.homeImg,
+                          height: isTablet ? 250 : 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                       const SizedBox(height: 20),
-                      const Text(
+                      Text(
                         'Popular Products',
                         style: TextStyle(
-                          fontSize: 23,
+                          fontSize: isTablet ? 28 : 23,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                         ),
@@ -186,27 +209,34 @@ class _HomePageState extends State<HomePage> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.65,
-                            ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isLargeScreen
+                              ? 4
+                              : (isTablet ? 3 : 2),
+                          crossAxisSpacing: isTablet ? 15 : 10,
+                          mainAxisSpacing: isTablet ? 15 : 10,
+                          childAspectRatio: isTablet ? 0.70 : 0.65,
+                        ),
                         itemCount: products.length,
                         itemBuilder: (context, index) {
                           final product = products[index];
                           return GestureDetector(
                             onTap: () {
-                              // Navigate to product detail page
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ProductDetailPage(
-                              //       productId: product.id ?? '',
-                              //     ),
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderPage(
+                                    productId: product.id ?? '',
+                                    supplierId: product.supplier?.id ?? '',
+                                    name: product.name ?? '',
+                                    price: product.price?.toDouble() ?? 0.0,
+                                    images: product.images.first,
+                                    category: product.category ?? '',
+                                    stock: product.stock ?? 0,
+                                    description: product.description ?? '',
+                                  ),
+                                ),
+                              );
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -228,17 +258,16 @@ class _HomePageState extends State<HomePage> {
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(12),
                                     ),
-                                    child:
-                                        product.image != null &&
-                                            product.image!.isNotEmpty
+                                    child: product.images.isNotEmpty
                                         ? CachedNetworkImage(
-                                            imageUrl: product.image!,
-                                            height: 150,
+                                            imageUrl: product.images.first,
+                                            height: isTablet ? 180 : 150,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) =>
                                                 Container(
-                                                  height: 150,
+                                                  height: isTablet ? 180 : 150,
+                                                  width: double.infinity,
                                                   color: Colors.grey.shade200,
                                                   child: const Center(
                                                     child:
@@ -246,20 +275,24 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                             errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                                      height: 150,
-                                                      color:
-                                                          Colors.grey.shade200,
-                                                      child: const Icon(
-                                                        Icons.shopping_bag,
-                                                        size: 40,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
+                                                (
+                                                  context,
+                                                  url,
+                                                  error,
+                                                ) => Container(
+                                                  height: isTablet ? 180 : 150,
+                                                  width: double.infinity,
+                                                  color: Colors.grey.shade200,
+                                                  child: const Icon(
+                                                    Icons.shopping_bag,
+                                                    size: 40,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
                                           )
                                         : Container(
-                                            height: 150,
+                                            height: isTablet ? 180 : 150,
+                                            width: double.infinity,
                                             color: Colors.grey.shade200,
                                             child: const Icon(
                                               Icons.shopping_bag,
@@ -270,7 +303,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: EdgeInsets.all(
+                                        isTablet ? 12.0 : 8.0,
+                                      ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -284,9 +319,9 @@ class _HomePageState extends State<HomePage> {
                                               // Product Name
                                               Text(
                                                 product.name ?? 'Unknown',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
+                                                  fontSize: isTablet ? 16 : 14,
                                                 ),
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
@@ -308,7 +343,9 @@ class _HomePageState extends State<HomePage> {
                                                   product.category ?? 'N/A',
                                                   style: TextStyle(
                                                     color: Colors.blue.shade700,
-                                                    fontSize: 11,
+                                                    fontSize: isTablet
+                                                        ? 12
+                                                        : 11,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -325,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                                                 children: [
                                                   Icon(
                                                     Icons.inventory_2_outlined,
-                                                    size: 14,
+                                                    size: isTablet ? 16 : 14,
                                                     color:
                                                         product.stock != null &&
                                                             product.stock! > 0
@@ -338,7 +375,9 @@ class _HomePageState extends State<HomePage> {
                                                     style: TextStyle(
                                                       color:
                                                           Colors.grey.shade600,
-                                                      fontSize: 12,
+                                                      fontSize: isTablet
+                                                          ? 13
+                                                          : 12,
                                                     ),
                                                   ),
                                                 ],
@@ -349,7 +388,7 @@ class _HomePageState extends State<HomePage> {
                                                 'Rs. ${product.price?.toStringAsFixed(2) ?? '0.00'}',
                                                 style: TextStyle(
                                                   color: Colors.blue.shade700,
-                                                  fontSize: 16,
+                                                  fontSize: isTablet ? 18 : 16,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
