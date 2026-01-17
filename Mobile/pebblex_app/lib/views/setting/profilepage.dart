@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pebblex_app/views/setting/changepassword_page.dart';
 import 'package:pebblex_app/views/setting/widgets/profile_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:pebblex_app/core/services/secure_storage.dart';
@@ -63,10 +64,9 @@ class _ProfilepageState extends State<Profilepage> {
   }
 
   void _navigateToChangePassword() {
-    // TODO: Implement change password navigation
-    ScaffoldMessenger.of(
+    Navigator.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('Change Password - Coming Soon')));
+    ).push(MaterialPageRoute(builder: (context) => const ChangepasswordPage()));
   }
 
   Future<void> _handleLogout() async {

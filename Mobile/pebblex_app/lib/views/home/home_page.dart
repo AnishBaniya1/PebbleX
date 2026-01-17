@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pebblex_app/core/resources/resource.dart';
 import 'package:pebblex_app/providers/product_provider.dart';
+import 'package:pebblex_app/views/home/search_page.dart';
 import 'package:pebblex_app/views/order/order_page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -43,13 +44,11 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    // Navigate to search page with query
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => UserSearchpage(searchQuery: query),
-    //   ),
-    // );
+    //Navigate to search page with query
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SearchPage(searchQuery: query)),
+    );
   }
 
   @override

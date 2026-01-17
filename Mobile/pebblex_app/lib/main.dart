@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pebblex_app/providers/auth_provider.dart';
 import 'package:pebblex_app/providers/cart_provider.dart';
 import 'package:pebblex_app/providers/product_provider.dart';
-import 'package:pebblex_app/views/auth/login_page.dart';
+import 'package:pebblex_app/splash_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -21,7 +21,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
-      child: MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: SplashPage()),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pebblex_app/core/resources/resource.dart';
 import 'package:pebblex_app/core/services/secure_storage.dart';
 import 'package:pebblex_app/views/auth/login_page.dart';
+import 'package:pebblex_app/views/home/main_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -26,13 +28,11 @@ class _SplashPageState extends State<SplashPage> {
     final String? isLoggedIn = await _storageService.readValue('islogin');
 
     if (isLoggedIn == 'true') {
-      final String? role = await _storageService.readValue('role');
-
       if (!mounted) return;
       // if (role == 'ADMIN') {
-      //   Navigator.of(context).pushReplacement(
-      //     MaterialPageRoute(builder: (context) => const AdminMainpage()),
-      //   );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
       // } else if (role == 'USER') {
       //   Navigator.of(context).pushReplacement(
       //     MaterialPageRoute(builder: (context) => const UserMainpage()),
@@ -63,22 +63,9 @@ class _SplashPageState extends State<SplashPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Image.asset(AppImage.splashImg, height: 150),
-              Text(
-                'Vehicle Rental App',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
-                  letterSpacing: 2,
-                  fontFamily: 'Roboto',
-                ),
-              ),
+              Image.asset(AppImage.splashImg, height: 180),
+
               SizedBox(height: 10),
-              Text(
-                'Find your ride, anytime, anywhere!',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
               const SizedBox(height: 30),
               CircularProgressIndicator(color: Colors.black),
             ],

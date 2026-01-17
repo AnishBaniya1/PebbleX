@@ -26,7 +26,6 @@ class AuthProvider extends ChangeNotifier {
 
       LoginResponseModel loginModel = LoginResponseModel.fromJson(response);
       await _storageService.setValue('authtoken', loginModel.data?.token ?? '');
-      // await _storageService.setValue('role', loginModel.role!);
       await _storageService.setValue('islogin', 'true');
       _isLoading = false;
       notifyListeners();
@@ -83,6 +82,31 @@ class AuthProvider extends ChangeNotifier {
       await _storageService.setValue('email', user?.email ?? '');
       await _storageService.setValue('phone', user?.phone?.toString() ?? '');
       await _storageService.setValue('address', user?.address ?? '');
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> changepassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final body = jsonEncode({
+        'currentPassword': oldPassword,
+        'newPassword': newPassword,
+      });
+
+      await _authService.changepassword(body: body);
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {

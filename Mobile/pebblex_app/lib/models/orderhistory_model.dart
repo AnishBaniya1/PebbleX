@@ -73,7 +73,7 @@ class Item {
   Item({required this.product, required this.quantity, required this.id});
 
   final Product? product;
-  final int? quantity;
+  final num? quantity;
   final String? id;
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -98,7 +98,7 @@ class Product {
 
   final String? id;
   final String? name;
-  final int? price;
+  final num? price;
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(id: json["_id"], name: json["name"], price: json["price"]);

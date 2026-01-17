@@ -49,7 +49,7 @@ class ApiService {
   //HTTP PUT Request
   Future<dynamic> httpPut({
     required String url,
-    required Map<String, dynamic> body,
+    required String body,
     required bool isWithoutToken,
   }) async {
     try {
@@ -58,7 +58,7 @@ class ApiService {
       final response = await http.put(
         Uri.parse(url),
         headers: headers,
-        body: jsonEncode(body),
+        body: body,
       );
 
       return _handleResponse(response);
@@ -80,6 +80,27 @@ class ApiService {
       return _handleResponse(response);
     } catch (e) {
       throw Exception('DELETE request failed: $e');
+    }
+  }
+
+  //HTTP PATCH Request
+  Future<dynamic> httpPatch({
+    required String url,
+    required String body,
+    required bool isWithoutToken,
+  }) async {
+    try {
+      final headers = await _buildHeaders(isWithoutToken: isWithoutToken);
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception('PATCH request failed: $e');
     }
   }
 

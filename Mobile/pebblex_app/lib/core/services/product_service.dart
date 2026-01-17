@@ -24,4 +24,36 @@ class ProductService {
 
     return response;
   }
+
+  // Get User Booking History
+  Future<Map<String, dynamic>> orderhistory() async {
+    final response = await _apiService.httpGet(
+      url: ApiEndpoints.orderHistoryApi,
+      isWithoutToken: false,
+    );
+
+    return response;
+  }
+
+  // Cancel Booking
+  Future<Map<String, dynamic>> cancelorder({required String orderId}) async {
+    final response = await _apiService.httpPut(
+      url: ApiEndpoints.cancelOrderApi(orderId),
+      body: '{}',
+
+      isWithoutToken: false,
+    );
+
+    return response;
+  }
+
+  // Search for product
+  Future<Map<String, dynamic>> searchproduct({required String search}) async {
+    final response = await _apiService.httpGet(
+      url: ApiEndpoints.searchProductApi(search),
+      isWithoutToken: false,
+    );
+
+    return response;
+  }
 }

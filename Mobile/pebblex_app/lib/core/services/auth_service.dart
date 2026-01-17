@@ -46,16 +46,16 @@ class AuthService {
     return response;
   }
 
-  //   // Update Password Api
-  //   Future<Map<String, dynamic>> changepassword({required String body}) async {
-  //     final response = await _apiService.httpPatch(
-  //       url: ApiEndpoints.changePasswordApi,
-  //       body: body,
-  //       isWithoutToken: false,
-  //     );
+  // Update Password Api
+  Future<Map<String, dynamic>> changepassword({required String body}) async {
+    final response = await _apiService.httpPatch(
+      url: ApiEndpoints.changePasswordApi,
+      body: body,
+      isWithoutToken: false,
+    );
 
-  //     return response;
-  //   }
+    return response;
+  }
 
   //   // Forget Password Api
   //   Future<Map<String, dynamic>> forgetpassword({required String body}) async {
